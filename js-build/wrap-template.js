@@ -33,21 +33,44 @@ var libsodium = (function () {
 	}
 
 	function to_hex(bs) {
-	var encoded = [];
-	for (var i = 0; i < bs.length; i++) {
-		encoded.push("0123456789abcdef"[(bs[i] >> 4) & 15]);
-		encoded.push("0123456789abcdef"[bs[i] & 15]);
-	}
-	return encoded.join('');
+		var resultBuffer_size= bs.length * 2 + 1;
+		var resultBuffer = new Uint8Array(resultBuffer_size);
+		var resultBuffer_byte = injectBytes(resultBuffer);
+		var bs_byte = injectBytes(bs);
+		libsodium_raw._sodium_bin2hex(resultBuffer_byte, resultBuffer_size, bs_byte, bs.length);
+
+		var encStr = '';
+		for (var i = 0; i < resultBuffer.length - 1; i++) encStr += String.fromCharCode(resultBuffer[i]);
+		FREE(resultBuffer_byte);
+		FREE(bs_byte);
+		return encStr;
+
+		/*var encoded = [];
+		for (var i = 0; i < bs.length; i++) {
+			encoded.push("0123456789abcdef"[(bs[i] >> 4) & 15]);
+			encoded.push("0123456789abcdef"[bs[i] & 15]);
+		}
+		return encoded.join('');*/
 	}
 
 	function from_hex(s) {
 		if (!is_hex(s)) throw new TypeError('The provided string doesn\'t look like hex data');
 		var result = new Uint8Array(s.length / 2);
+		var result_byte = injectBytes(result);
+		var s_a = string_to_Uint8Array(s);
+		var s_byte = injectBytes(s_a);
+
+		libsodium_raw._sodium_hex2bin(result_byte, result.length, s_byte, s.length, null, result.length, 0);
+
+		FREE(result_byte);
+		FREE(s_byte);
+		return result;
+		/*if (!is_hex(s)) throw new TypeError('The provided string doesn\'t look like hex data');
+		var result = new Uint8Array(s.length / 2);
 		for (var i = 0; i < s.length / 2; i++) {
 			result[i] = parseInt(s.substr(2*i,2),16);
 		}
-		return result;
+		return result;*/
 	}
 
 	function is_hex(s){
