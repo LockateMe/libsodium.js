@@ -7,12 +7,25 @@ to pure JavaScript using [Emscripten](https://github.com/kripken/emscripten),
 with automatically generated wrappers to make it easy to use in web
 applications.
 
-The complete library weights 137 Kb (minified, gzipped) and can run in
+The complete library weights 151 Kb (minified, gzipped) and can run in
 a web browser as well as server-side.
+
+### Compatibility
+
+Supported browsers/JS engines:
+
+* Chrome >= 16
+* Edge >= 0.11
+* Firefox >= 21
+* Internet Explorer >= 11
+* Mobile Safari on iOS >= 8.0 (older versions produce incorrect results)
+* NodeJS
+* Opera >= 15
+* Safari >= 6 (older versions produce incorrect results)
 
 ## Installation
 
-Ready-to-use files based on libsodium 1.0.3 can be directly copied to your
+Ready-to-use files based on libsodium 1.0.5 can be directly copied to your
 project.
 
 ### Usage with global definitions, for web browsers
@@ -66,6 +79,7 @@ console.log(sodium.to_hex(sodium.crypto_generichash(64, 'test')));
 * [`crypto_box_seal`](http://doc.libsodium.org/public-key_cryptography/sealed_boxes.html)
 * [`crypto_generichash`](http://doc.libsodium.org/hashing/generic_hashing.html) (Blake2b)
 * [`crypto_hash`](http://doc.libsodium.org/advanced/sha-2_hash_function.html) (SHA512/256)
+* [`crypto_onetimeauth`](http://doc.libsodium.org/advanced/poly1305.html) (Poly1305)
 * [`crypto_pwhash`](http://doc.libsodium.org/password_hashing/README.html) (scrypt)
 * [`crypto_scalarmult`](http://doc.libsodium.org/advanced/scalar_multiplication.html) (Curve25519)
 * [`crypto_secretbox`](http://doc.libsodium.org/secret-key_cryptography/authenticated_encryption.html)
@@ -79,7 +93,9 @@ console.log(sodium.to_hex(sodium.crypto_generichash(64, 'test')));
 * `from_base64()`, `to_base64()`
 * `from_hex()`, `to_hex()`
 * `from_string()`, `to_string()`
-* `memcmp()` (constant-time comparison, returns `true` or `false`)
+* `memcmp()` (constant-time check for equality, returns `true` or `false`)
+* `compare() (constant-time comparison. Values must have the same
+size. Returns `-1`, `0` or `1`)
 * `memzero()` (applies to `Uint8Array` objects)
 * `increment()` (increments an arbitrary-long number stored as a
 little-endian `Uint8Array` - typically to increment nonces)
@@ -87,7 +103,7 @@ little-endian `Uint8Array` - typically to increment nonces)
 ## API
 
 The API exposed by the wrappers is identical to the one of the C
-library, except that buffer lengths never need to be explicitely given.
+library, except that buffer lengths never need to be explicitly given.
 
 Binary input buffers should be `Uint8Array` objects. However, if a string
 is given instead, the wrappers will automatically convert the string
@@ -134,7 +150,7 @@ need to be installed on your system:
 * automake
 * emscripten
 * git
-* io.js or nodejs
+* nodejs
 * libtool
 * make
 * mocha (`npm install -g mocha`)
@@ -142,6 +158,30 @@ need to be installed on your system:
 
 Running `make` will clone libsodium, build it, test it, build the
 wrapper, and create the modules and minified distribution files.
+
+### Custom build
+
+The build available in this repository does not contain all the functions available in the original libsodium library.
+
+Providing that you have all the build dependencies installed, here is how you can build libsodium.js to include the functions you need :
+
+```shell
+git clone https://github.com/jedisct1/libsodium.js
+cd ./libsodium.js
+
+# Get the original C version of libsodium and configure it
+make libsodium/configure
+
+# Modify the emscripten.sh
+# Specifically, add the name of the missing functions and constants in the "EXPORTED_FUNCTIONS" array.
+# Ensure that the name begins with an underscore and that it is between double quotes. 
+nano libsodium/dist-build/emscripten.sh
+
+# Build libsodium, and then libsodium.js with your chosen functions
+make
+```
+
+__NOTE:__ for each of the functions/constants you add, make sure that the corresponding symbol files exist in the `wrapper/symbols` folder and that the constants are listed in the `wrapper/constants.json` file.
 
 ## Authors
 
