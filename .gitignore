@@ -6,3 +6,5 @@ API.md
 test/browsers/sodium.js
 test/browsers/sodium.min.js
 test/node_modules/
+test/sodium.js
+test/libsodium.js
