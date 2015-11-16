@@ -174,7 +174,7 @@ make libsodium/configure
 
 # Modify the emscripten.sh
 # Specifically, add the name of the missing functions and constants in the "EXPORTED_FUNCTIONS" array.
-# Ensure that the name begins with an underscore and that it is between double quotes. 
+# Ensure that the name begins with an underscore and that it is between double quotes.
 nano libsodium/dist-build/emscripten.sh
 
 # Build libsodium, and then libsodium.js with your chosen functions
@@ -182,6 +182,8 @@ make
 ```
 
 __NOTE:__ for each of the functions/constants you add, make sure that the corresponding symbol files exist in the `wrapper/symbols` folder and that the constants are listed in the `wrapper/constants.json` file.
+
+__NOTE:__ If try you run `node test/test.js` to test your custom build, it will not test your custom build (but it will test the latest "official" build). However you can test it inside the browser by opening `test/index.html`.
 
 ## Authors
 
